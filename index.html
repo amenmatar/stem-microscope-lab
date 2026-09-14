@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنفوجرافيك ومختبر STEM التفاعلي: المجهر الضوئي المركّب - الصف السادس</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        palestine: {
+                            green: '#007A3D',
+                            red: '#CE1126',
+                            black: '#000000',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0f172a;
+            color: #334155;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        /* Custom Lens Viewport CSS Effects */
+        .lens-container {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            border: 8px solid #334155;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6), 0 0 20px rgba(16, 185, 129, 0.3);
+            overflow: hidden;
+            background: #000;
+        }
+
+        .lens-glass {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.3s ease, filter 0.2s ease, opacity 0.3s ease;
+        }
+
+        .lens-grid {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        .lens-reflection {
+            position: absolute;
+            top: 5%;
+            left: 10%;
+            width: 80%;
+            height: 40%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 60%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Hotspot animation */
+        .hotspot-btn {
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white !important; color: black !important; }
+            .glass-card { background: white !important; box-shadow: none !important; border: 1px solid #ccc !important; }
+            .print-break { page-break-before: always; }
+        }
+    </style>
+</head>
+<body class="p-2 md:p-6 min-h-screen">
+
+    <!-- Top Interactive Control Bar -->
+    <header class="max-w-6xl mx-auto mb-6 bg-slate-900 text-white p-4 rounded-2xl shadow-xl border border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-900 text-2xl font-black shadow-lg">
+                <i class="fa-solid fa-microscope"></i>
+            </div>
+            <div>
+                <h1 class="text-lg md:text-xl font-black text-white flex items-center gap-2">
+                    مختبر STEM التفاعلي: المجهر الضوئي المركّب
+                    <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-0.5 rounded-full font-bold">الصف السادس</span>
+                </h1>
+                <p class="text-xs text-slate-400">منهاج العلوم والحياة - فلسطين | إنفوجرافيك تفاعلي مدمج بالتطبيقات العملية</p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-2">
+            <button onclick="toggleAudio()" id="soundBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition border border-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-volume-high text-emerald-400"></i> <span id="soundLabel">المؤثرات: مفعلة</span>
+            </button>
+            <button onclick="toggleModelAnswers()" id="answersBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md">
+                <i class="fa-solid fa-eye"></i> <span id="answersLabel">إظهار الإجابات النموذجية</span>
+            </button>
+            <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md">
+                <i class="fa-solid fa-print"></i> طباعة ورقة العمل
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto space-y-6">
+
+        <!-- Student Info Header Block -->
+        <div class="glass-card p-6 rounded-2xl shadow-xl text-slate-800 relative overflow-hidden border-t-4 border-emerald-500">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <div class="flex items-center gap-2 text-xs font-bold text-emerald-700 uppercase tracking-widest mb-1">
+                        <span>دولة فلسطين</span> • <span>وزارة التربية والتعليم</span> • <span>مدارس الوطن</span>
+                    </div>
+                    <h2 class="text-2xl font-black text-slate-900">ورقة عمل إنفوجرافيك تفاعلية: المجهر الضوئي (المركّب)</h2>
+                    <p class="text-xs text-slate-600 mt-1">تطبيق متكامل لمهارات الاستكشاف والتشغيل والتحليل الرياضي والهندسي (STEM)</p>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs w-full md:w-auto bg-slate-100 p-3 rounded-xl border border-slate-200">
+                    <div>
+                        <span class="text-slate-500 block text-[10px]">اسم الطالب/ـة:</span>
+                        <input type="text" placeholder="اكتب اسمك هنا..." class="bg-white border border-slate-300 rounded px-2 py-1 w-full text-xs font-bold text-emerald-800 focus:outline-emerald-500">
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block text-[10px]">الصف والشعبة:</span>
+                        <input type="text" value="السادس (  )" class="bg-white border border-slate-300 rounded px-2 py-1 w-full text-xs font-bold focus:outline-emerald-500">
+                    </div>
+                    <div class="col-span-2 md:col-span-1">
+                        <span class="text-slate-500 block text-[10px]">التاريخ:</span>
+                        <span class="font-bold text-slate-800 text-xs block py-1">سبتمبر 2026 م</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEM Bar -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-4 border-t border-slate-200 text-center text-xs font-bold">
+                <div class="bg-emerald-50 text-emerald-800 py-2.5 px-3 rounded-xl border border-emerald-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-atom text-emerald-600 text-base"></i> S - العلوم (Science)
+                </div>
+                <div class="bg-cyan-50 text-cyan-800 py-2.5 px-3 rounded-xl border border-cyan-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-microchip text-cyan-600 text-base"></i> T - التكنولوجيا (Tech)
+                </div>
+                <div class="bg-purple-50 text-purple-800 py-2.5 px-3 rounded-xl border border-purple-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-pen-ruler text-purple-600 text-base"></i> E - الهندسة (Engineering)
+                </div>
+                <div class="bg-rose-50 text-rose-800 py-2.5 px-3 rounded-xl border border-rose-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-calculator text-rose-600 text-base"></i> M - الرياضيات (Math)
+                </div>
+            </div>
+        </div>
+
+        <!-- VIRTUAL LAB SIMULATOR SECTION -->
+        <section class="glass-card p-6 rounded-2xl shadow-xl space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-bold">
+                        <i class="fa-solid fa-flask-vial"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-black text-slate-900">المختبر الافتراضي: فحص العينات تحت المجهر الضوئي المركّب</h3>
+                        <p class="text-xs text-slate-500">انقر على أجزاء المجهر للتعرف عليها، وجرّب تغيير العدسات الضابطين لرؤية العينّة بوضوح!</p>
+                    </div>
+                </div>
+                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full animate-pulse">
+                    🟢 محاكي تفاعلي حي
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                
+                <!-- Microscope Interactive Diagram with Hotspots -->
+                <div class="lg:col-span-5 bg-gradient-to-b from-slate-900 to-slate-800 p-5 rounded-2xl text-white relative flex flex-col items-center justify-center min-h-[380px] shadow-inner">
+                    <span class="absolute top-3 right-3 text-[10px] bg-slate-800 px-2.5 py-1 rounded-lg text-slate-300 font-bold border border-slate-700">
+                        مخطط المجهر التفاعلي (أجزاؤه الـ9)
+                    </span>
+
+                    <!-- Interactive Diagram Graphics -->
+                    <div class="relative my-4 w-52 h-72 flex flex-col items-center justify-between py-2">
+                        <!-- Part 1: Eyepiece -->
+                        <button onclick="selectPart(1)" class="hotspot-btn bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black text-xs px-3 py-1 rounded-full shadow-lg transition transform hover:scale-110 flex items-center gap-1">
+                            <span>1. العدسة العينية</span> <i class="fa-solid fa-eye"></i>
+                        </button>
+                        
+                        <!-- Body Tube & Arm -->
+                        <div class="text-slate-400 text-xs font-bold border-r-2 border-slate-600 pr-2 my-1">
+                            الاسطوانة + الذراع
+                        </div>
+
+                        <!-- Part 2 & 3: Revolving Nosepiece & Objectives -->
+                        <div class="flex gap-2">
+                            <button onclick="selectPart(2)" class="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black text-[11px] px-2.5 py-1 rounded-lg shadow transition">
+                                2. القرص
+                            </button>
+                            <button onclick="selectPart(3)" class="bg-purple-500 hover:bg-purple-400 text-white font-black text-[11px] px-2.5 py-1 rounded-lg shadow transition">
+                                3. العدسات الشيئية
+                            </button>
+                        </div>
+
+                        <!-- Part 4 & 5: Stage & Clips -->
+                        <div class="flex gap-2 my-1">
+                            <button onclick="selectPart(4)" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-black text-[11px] px-2.5 py-1 rounded-lg shadow transition">
+                                4. المنضدة
+                            </button>
+                            <button onclick="selectPart(5)" class="bg-slate-300 hover:bg-white text-slate-900 font-black text-[11px] px-2.5 py-1 rounded-lg shadow transition">
+                                5. المثبت
+                            </button>
+                        </div>
+
+                        <!-- Part 6 & 7: Coarse & Fine Focus -->
+                        <div class="flex gap-2">
+                            <button onclick="selectPart(6)" class="bg-rose-500 hover:bg-rose-400 text-white font-black text-[11px] px-2.5 py-1 rounded-lg shadow transition">
+                                6. الضابط الكبير
+                            </button>
+                            <button onclick="selectPart(7)" class="bg-indigo-500 hover:bg-indigo-400 text-white font-black text-[11px] px-2.5 py-1 rounded-lg shadow transition">
+                                7. الضابط الصغير
+                            </button>
+                        </div>
+
+                        <!-- Part 8 & 9: Condenser & Light Source -->
+                        <div class="flex gap-2 mt-1">
+                            <button onclick="selectPart(8)" class="bg-teal-500 hover:bg-teal-400 text-slate-900 font-black text-[11px] px-2.5 py-1 rounded-lg shadow transition">
+                                8. المكثف
+                            </button>
+                            <button onclick="selectPart(9)" class="bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-black text-[11px] px-2.5 py-1 rounded-lg shadow transition">
+                                9. المصدر الضوئي
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Part Card -->
+                    <div id="partInfoBox" class="w-full bg-slate-800/90 border border-slate-700 p-3 rounded-xl text-xs space-y-1 mt-2">
+                        <span class="text-emerald-400 font-bold block" id="partTitle">📌 اضغط على أي جزء لتتعرف على وظيفته الدقيقة</span>
+                        <p class="text-slate-300 leading-relaxed" id="partDesc">المجهر الضوئي المركب يتكون من أجزاء آلية ميكانيكية وأجزاء بصرية ضوئية تعمل معاً لتكبير العينات.</p>
+                    </div>
+                </div>
+
+                <!-- Microscope Lens Viewport & Controls -->
+                <div class="lg:col-span-7 bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-5">
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-3 rounded-xl border border-slate-200">
+                        <!-- Select Specimen Slide -->
+                        <div class="w-full sm:w-auto flex-1">
+                            <label class="block text-xs font-bold text-slate-700 mb-1"><i class="fa-solid fa-vial text-emerald-600"></i> اختر الشريحة الزجاجية:</label>
+                            <select id="slideSelect" onchange="updateMicroscopeView()" class="w-full text-xs p-2 border border-slate-300 rounded-lg bg-slate-50 font-bold focus:ring-2 focus:ring-emerald-500">
+                                <option value="onion">🧅 خلايا قشرة البصل (Onion Epidermis)</option>
+                                <option value="paramecium">🦠 كائن البراميسيوم (Paramecium)</option>
+                                <option value="stomata">🍃 ثغور ورقة النبات (Plant Stomata)</option>
+                                <option value="blood">🩸 خلايا الدم (Blood Cells)</option>
+                            </select>
+                        </div>
+
+                        <!-- Objective Lens Choice -->
+                        <div class="w-full sm:w-auto">
+                            <label class="block text-xs font-bold text-slate-700 mb-1"><i class="fa-solid fa-circle-dot text-indigo-600"></i> العدسة الشيئية:</label>
+                            <div class="flex gap-1">
+                                <button onclick="setObjective(4)" id="obj4" class="obj-btn bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-lg text-xs transition">4X (صغرى)</button>
+                                <button onclick="setObjective(10)" id="obj10" class="obj-btn bg-slate-200 text-slate-700 font-bold px-2.5 py-1.5 rounded-lg text-xs transition">10X (وسطى)</button>
+                                <button onclick="setObjective(40)" id="obj40" class="obj-btn bg-slate-200 text-slate-700 font-bold px-2.5 py-1.5 rounded-lg text-xs transition">40X (كبرى)</button>
+                                <button onclick="setObjective(100)" id="obj100" class="obj-btn bg-slate-200 text-slate-700 font-bold px-2.5 py-1.5 rounded-lg text-xs transition">100X (زيتية)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Virtual Lens Viewport + Controls -->
+                    <div class="flex flex-col sm:flex-row items-center justify-around gap-6 bg-slate-900 p-5 rounded-2xl border border-slate-800 text-white">
+                        
+                        <!-- The Ocular Viewport -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="lens-container">
+                                <div id="lensView" class="lens-glass"></div>
+                                <div class="lens-grid"></div>
+                                <div class="lens-reflection"></div>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-xs font-bold text-emerald-400">حقل الرؤية المجهري المباشر</span>
+                                <div id="magnificationDisplay" class="text-sm font-black text-white font-mono mt-0.5">التكبير الكلي: 40X</div>
+                            </div>
+                        </div>
+
+                        <!-- Knobs & Sliders -->
+                        <div class="w-full sm:w-1/2 space-y-4">
+                            <!-- Coarse Adjustment Slider -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="font-bold text-rose-400"><i class="fa-solid fa-gear"></i> الضابط الكبير (التركيز المبدئي):</span>
+                                    <span id="coarseVal" class="font-mono text-slate-300">50%</span>
+                                </div>
+                                <input type="range" id="coarseSlider" min="0" max="100" value="20" oninput="updateMicroscopeView()" class="w-full accent-rose-500 cursor-pointer">
+                            </div>
+
+                            <!-- Fine Adjustment Slider -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="font-bold text-indigo-400"><i class="fa-solid fa-sliders"></i> الضابط الصغير (التوضيح الدقيق):</span>
+                                    <span id="fineVal" class="font-mono text-slate-300">50%</span>
+                                </div>
+                                <input type="range" id="fineSlider" min="0" max="100" value="50" oninput="updateMicroscopeView()" class="w-full accent-indigo-500 cursor-pointer">
+                            </div>
+
+                            <!-- Light Source Slider -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span class="font-bold text-amber-400"><i class="fa-solid fa-lightbulb"></i> المكثف وشدة الإضاءة:</span>
+                                    <span id="lightVal" class="font-mono text-slate-300">80%</span>
+                                </div>
+                                <input type="range" id="lightSlider" min="10" max="150" value="80" oninput="updateMicroscopeView()" class="w-full accent-amber-400 cursor-pointer">
+                            </div>
+
+                            <!-- Focus Status Feedback -->
+                            <div id="focusStatus" class="p-2.5 rounded-xl text-center font-bold text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                ⚠️ الصورة غير واضحة! حرك الضابط الكبير والصغير لضبط التبؤر.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 1: SCIENCE (S) -->
+        <section class="glass-card p-6 rounded-2xl shadow-xl space-y-6">
+            <div class="flex items-center gap-3 border-r-4 border-emerald-600 pr-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-flask"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800">1. ركن العلوم (Science) | التركيب والوظائف الحيوية</h3>
+                    <p class="text-xs text-slate-500">التعرف الدقيق على أجزاء المجهر الضوئي المركب الواردة بدرس العلوم (ص 8 - 9)</p>
+                </div>
+            </div>
+
+            <!-- Complete Table from Palestinian Curriculum Page 9 -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                <table class="w-full text-right text-xs">
+                    <thead class="bg-slate-900 text-white font-bold">
+                        <tr>
+                            <th class="p-3 text-center w-12">الرقم</th>
+                            <th class="p-3 w-44">أجزاء المجهر الضوئي المركّب</th>
+                            <th class="p-3">التركيب والوظيفة العلمية الدقيقة (أكمل أو تحقق)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-bold text-center bg-slate-100">1</td>
+                            <td class="p-3 font-bold text-emerald-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-eye text-slate-400"></i> العدسة العينية
+                            </td>
+                            <td class="p-3">
+                                عدسة ننظر من خلالها، تقع في أعلى الاسطوانة وتعمل على تكبير صورة العينة.
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-bold text-center bg-slate-100">2</td>
+                            <td class="p-3 font-bold text-emerald-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-rotate text-slate-400"></i> قرص تحريك العدسات
+                            </td>
+                            <td class="p-3">
+                                قرص دائر يتيح التبديل بين العدسات الشيئية المختلفة بسهولة عند الفحص.
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-bold text-center bg-slate-100">3</td>
+                            <td class="p-3 font-bold text-emerald-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-bullseye text-slate-400"></i> العدسات الشيئية
+                            </td>
+                            <td class="p-3">
+                                عدسات محدبة متعددة (صغرى، وسطى، كبرى) مثبتة على قرص متحرك تكون قريبة من العينة.
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-bold text-center bg-slate-100">4</td>
+                            <td class="p-3 font-bold text-emerald-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-square text-slate-400"></i> المنضدة
+                            </td>
+                            <td class="p-3">
+                                سطح مستوٍ توضع عليه العينة المطلوب تكبيرها، في وسطه فتحة لمرور الضوء ويمكن تحريكه للأعلى والأسفل.
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-bold text-center bg-slate-100">5</td>
+                            <td class="p-3 font-bold text-emerald-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-paperclip text-slate-400"></i> مثبت الشريحة
+                            </td>
+                            <td class="p-3">
+                                قطعتان معدنيتان لتثبيت الشريحة الزجاجية الحاملة للعينة بإحكام على المنضدة.
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-bold text-center bg-slate-100">6</td>
+                            <td class="p-3 font-bold text-emerald-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-gear text-slate-400"></i> الضابطان الكبيران
+                            </td>
+                            <td class="p-3">
+                                عجلان كبيرا الحجم يستخدمان لتحريك المنضدة وتوضيح رؤية العينة مبدئياً.
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-bold text-center bg-slate-100">7</td>
+                            <td class="p-3 font-bold text-emerald-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-sliders text-slate-400"></i> الضابطان الصغيران
+                            </td>
+                            <td class="p-3">
+                                عجلان صغيران يستخدمان لتوضيح العينة بدقة عالية بعد الضبط باستخدام الضابطين الكبيرين.
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-bold text-center bg-slate-100">8</td>
+                            <td class="p-3 font-bold text-emerald-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-nodes text-slate-400"></i> المكثف (مجمع الضوء)
+                            </td>
+                            <td class="p-3">
+                                قرص مثبت أسفل المنضدة يسمح بالتحكم بكمية الضوء المارة إلى العدسة والفيض البصري.
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-bold text-center bg-slate-100">9</td>
+                            <td class="p-3 font-bold text-emerald-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-lightbulb text-slate-400"></i> مصدر الضوء
+                            </td>
+                            <td class="p-3">
+                                مصباح كهربائي (أو مرآة) يرسل الضوء عبر فتحة المنضدة إلى العينة المجهرية.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Critical Thinking Questions (Page 9) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                    <h4 class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-question text-emerald-600"></i>
+                        سؤال التفكير (ص 9): عدد العدسات الشيئية في المجهر أكثر من العدسات العينية، أفسر؟
+                    </h4>
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                        <textarea rows="2" placeholder="اكتب تفسيرك العلمي هنا..." class="w-full text-xs p-1 border-0 focus:ring-0 resize-none font-bold text-slate-700"></textarea>
+                        <div class="model-answer hidden pt-2 mt-2 border-t border-emerald-100 text-emerald-800 font-bold">
+                            💡 **الإجابة النموذجية:** لتوفير خيارات ومستويات تكبير متعددة ومتدرجة (صغرى، وسطى، كبرى) تناسب حجم العينة المراد فحصها وتسمح برؤية حقل واسع ثم التفاصيل.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                    <h4 class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-question text-emerald-600"></i>
+                        ماذا تعني الأرقام المكتوبة على العدسات الشيئية والعينية (مثل 4X, 10X, 40X)؟
+                    </h4>
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                        <textarea rows="2" placeholder="اكتب إجابتك هنا..." class="w-full text-xs p-1 border-0 focus:ring-0 resize-none font-bold text-slate-700"></textarea>
+                        <div class="model-answer hidden pt-2 mt-2 border-t border-emerald-100 text-emerald-800 font-bold">
+                            💡 **الإجابة النموذجية:** تدل على مقدار أو قوة تكبير العدسة للصورة مقارنة بحجم الشيء الحقيقي (مثلاً 10X تعني تكبير الشيء 10 مرات).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: TECHNOLOGY & SAFETY (T) -->
+        <section class="glass-card p-6 rounded-2xl shadow-xl space-y-6">
+            <div class="flex items-center gap-3 border-r-4 border-cyan-600 pr-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800">2. ركن التكنولوجيا والسلامة (Technology & Safety)</h3>
+                    <p class="text-xs text-slate-500">خوارزمية الاستخدام الصحيح للمجهر وإجراءات السلامة الحيوية والوقائية (ص 10 - 11)</p>
+                </div>
+            </div>
+
+            <!-- Interactive Step Reordering Activity -->
+            <div class="bg-cyan-50/50 p-5 rounded-2xl border border-cyan-200 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h4 class="text-xs font-bold text-cyan-900 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-cyan-600"></i>
+                        نشاط تفاعلي: رتّب خطوات التشغيل الصحيحة للمجهر الضوئي المركّب (من 1 إلى 4)
+                    </h4>
+                    <button onclick="checkStepOrder()" class="bg-cyan-600 hover:bg-cyan-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow">
+                        تحقق من الترتيب
+                    </button>
+                </div>
+
+                <div id="stepContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <!-- Step Cards (Will be dynamically rendered/swapped) -->
+                    <div class="step-card bg-white p-3 rounded-xl border border-cyan-200 shadow-sm flex items-center gap-3 cursor-pointer" data-id="1">
+                        <span class="step-num w-7 h-7 rounded-full bg-cyan-100 text-cyan-800 font-black flex items-center justify-center text-xs">1</span>
+                        <p class="text-xs text-slate-700">حمل المجهر بإحدى اليدين من <strong>الذراع</strong> وإسناد <strong>القاعدة</strong> باليد الأخرى وإبقائه رأسياً.</p>
+                    </div>
+
+                    <div class="step-card bg-white p-3 rounded-xl border border-cyan-200 shadow-sm flex items-center gap-3 cursor-pointer" data-id="2">
+                        <span class="step-num w-7 h-7 rounded-full bg-cyan-100 text-cyan-800 font-black flex items-center justify-center text-xs">2</span>
+                        <p class="text-xs text-slate-700">وضع الشريحة على المنضدة وتثبيتها جيداً بوساطة <strong>مثبت الشرائح</strong> فوق فتحة الضوء.</p>
+                    </div>
+
+                    <div class="step-card bg-white p-3 rounded-xl border border-cyan-200 shadow-sm flex items-center gap-3 cursor-pointer" data-id="3">
+                        <span class="step-num w-7 h-7 rounded-full bg-cyan-100 text-cyan-800 font-black flex items-center justify-center text-xs">3</span>
+                        <p class="text-xs text-slate-700">فحص الشريحة بالبدء بالعدسة الشيئية <strong>الصغرى</strong> دائماً لضمان حقل رؤية واسع وحماية الشريحة.</p>
+                    </div>
+
+                    <div class="step-card bg-white p-3 rounded-xl border border-cyan-200 shadow-sm flex items-center gap-3 cursor-pointer" data-id="4">
+                        <span class="step-num w-7 h-7 rounded-full bg-cyan-100 text-cyan-800 font-black flex items-center justify-center text-xs">4</span>
+                        <p class="text-xs text-slate-700">استخدام <strong>الضابطين الكبيرين</strong> للتوضيح المبدئي، ثم <strong>الضابطين الصغيرين</strong> لإظهار التفاصيل الدقيقة.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Safety Warnings Box (Textbook page 10 & 11) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-rose-50 border-r-4 border-rose-500 p-4 rounded-xl space-y-1">
+                    <h5 class="font-bold text-rose-800 text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+                        أنتبه (ص 10): تحذير السلامة البصرية
+                    </h5>
+                    <p class="text-xs text-rose-900 leading-relaxed">
+                        يُنصح بعدم استخدام المجهر الضوئي المركّب في مكان معرّض لأشعة الشمس القوية بشكل مباشر، لخطورتها الشديدة على شبكية العين أثناء النظر عبر العدسات!
+                    </p>
+                </div>
+
+                <div class="bg-teal-50 border-r-4 border-teal-500 p-4 rounded-xl space-y-1">
+                    <h5 class="font-bold text-teal-800 text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-pump-soap text-teal-600"></i>
+                        أنتبه (ص 11): الوقاية والتطهير الصحي
+                    </h5>
+                    <p class="text-xs text-teal-900 leading-relaxed">
+                        يُنصح بغسل الأيدي وتعقيمها بانتظام بعد الانتهاء من استخدام المجهر والشرائح الزجاجية تلافياً لانتقال أي ملوثات أو جراثيم قد تسبب الأمراض.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: MATHEMATICS (M) -->
+        <section class="glass-card p-6 rounded-2xl shadow-xl space-y-6">
+            <div class="flex items-center gap-3 border-r-4 border-rose-600 pr-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800">3. ركن الرياضيات (Mathematics) | حساب مقدار التكبير</h3>
+                    <p class="text-xs text-slate-500">القانون الرياضي المعتمَد في الكتاب المدرسي لحساب تكبير المجهر الضوئي (ص 10)</p>
+                </div>
+            </div>
+
+            <!-- Mathematical Law Highlight Banner -->
+            <div class="bg-slate-900 text-white p-5 rounded-2xl text-center space-y-2 border border-slate-800 shadow-lg">
+                <span class="text-xs font-bold text-rose-400 tracking-widest uppercase">القانون الرياضي الأساسي للتكبير</span>
+                <div class="text-lg md:text-2xl font-black text-emerald-300 font-mono dir-ltr">
+                    مقدار التكبير الكلي = قوة العدسة العينية × قوة العدسة الشيئية
+                </div>
+            </div>
+
+            <!-- Math Interactive Self-Quiz Table -->
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <h4 class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-square-check text-rose-600"></i>
+                        جدول التحدي الحسابي (احسب النتيجة ثم اضغط تحقق):
+                    </h4>
+                    <button onclick="checkMathQuiz()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition shadow">
+                        تصحيح التمارين الحسابية
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                    <table class="w-full text-center text-xs">
+                        <thead class="bg-rose-100 text-rose-900 font-bold border-b border-rose-200">
+                            <tr>
+                                <th class="p-3">الحالة</th>
+                                <th class="p-3">قوة العدسة العينية</th>
+                                <th class="p-3">قوة العدسة الشيئية</th>
+                                <th class="p-3">ادخل ناتج التكبير الكلي</th>
+                                <th class="p-3">النتيجة والتقييم</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
+                            <tr>
+                                <td class="p-3 font-bold bg-slate-50">1</td>
+                                <td class="p-3 font-mono font-bold">10X</td>
+                                <td class="p-3 font-mono font-bold">4X (الصغرى)</td>
+                                <td class="p-3">
+                                    <input type="number" id="math1" placeholder="؟" class="w-20 text-center p-1 border border-slate-300 rounded font-mono font-bold focus:ring-2 focus:ring-rose-500"> X
+                                </td>
+                                <td class="p-3 font-bold" id="res1">-</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold bg-slate-50">2</td>
+                                <td class="p-3 font-mono font-bold">10X</td>
+                                <td class="p-3 font-mono font-bold">10X (الوسطى)</td>
+                                <td class="p-3">
+                                    <input type="number" id="math2" placeholder="؟" class="w-20 text-center p-1 border border-slate-300 rounded font-mono font-bold focus:ring-2 focus:ring-rose-500"> X
+                                </td>
+                                <td class="p-3 font-bold" id="res2">-</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold bg-slate-50">3</td>
+                                <td class="p-3 font-mono font-bold">10X</td>
+                                <td class="p-3 font-mono font-bold">40X (الكبرى)</td>
+                                <td class="p-3">
+                                    <input type="number" id="math3" placeholder="؟" class="w-20 text-center p-1 border border-slate-300 rounded font-mono font-bold focus:ring-2 focus:ring-rose-500"> X
+                                </td>
+                                <td class="p-3 font-bold" id="res3">-</td>
+                            </tr>
+                            <tr class="bg-rose-50/40">
+                                <td class="p-3 font-bold text-rose-800">4 (تحدي)</td>
+                                <td class="p-3 font-mono font-bold">15X</td>
+                                <td class="p-3 font-mono font-bold">100X (الزيتية)</td>
+                                <td class="p-3">
+                                    <input type="number" id="math4" placeholder="؟" class="w-20 text-center p-1 border border-slate-300 rounded font-mono font-bold focus:ring-2 focus:ring-rose-500"> X
+                                </td>
+                                <td class="p-3 font-bold" id="res4">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: ENGINEERING & ARTS (E) -->
+        <section class="glass-card p-6 rounded-2xl shadow-xl space-y-6">
+            <div class="flex items-center gap-3 border-r-4 border-purple-600 pr-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800">4. ركن الهندسة والفنون (Engineering & Arts)</h3>
+                    <p class="text-xs text-slate-500">نشاط الرسم المجهري للعينة والتصميم الهندسي (ص 11)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Interactive HTML5 Drawing Canvas -->
+                <div class="lg:col-span-7 bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold text-slate-800 text-xs flex items-center gap-2">
+                            <i class="fa-solid fa-paintbrush text-purple-600"></i> لوحة الرسم المجهري الرقمية التفاعلية:
+                        </h4>
+                        <div class="flex items-center gap-2">
+                            <input type="color" id="brushColor" value="#059669" class="w-7 h-7 rounded border-0 cursor-pointer">
+                            <button onclick="clearCanvas()" class="bg-rose-100 hover:bg-rose-200 text-rose-800 text-xs font-bold px-2.5 py-1 rounded-lg transition">
+                                <i class="fa-solid fa-eraser"></i> مسح
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500">ارسم تفاصيل العينة كما تشاهدها داخل دائرة حقل الرؤية المجهري:</p>
+
+                    <!-- Canvas Box -->
+                    <div class="bg-white border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center p-2 relative">
+                        <canvas id="drawCanvas" width="380" height="220" class="cursor-crosshair touch-none bg-white rounded-lg"></canvas>
+                    </div>
+                </div>
+
+                <!-- Research Portfolio Task (Page 11) -->
+                <div class="lg:col-span-5 bg-purple-50/60 p-4 rounded-xl border border-purple-200 flex flex-col justify-between space-y-3">
+                    <div>
+                        <span class="bg-purple-200 text-purple-900 font-bold px-2.5 py-1 rounded-full text-[10px]">
+                            📁 نشاط ملف الإنجاز (أبحث - ص 11)
+                        </span>
+                        <h4 class="font-bold text-purple-950 text-xs mt-3">
+                            متى نلجأ لاستخدام العدسة الشيئية الكبرى (العدسة الزيتية 100X)؟ وما فائدة الزيت؟
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            بالرجوع إلى مصادر التعلم أو مكتبة المدرسة، اكتب تقريراً موجزاً للظروف التي تستدعي الفحص الزيتي.
+                        </p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <textarea rows="4" placeholder="اكتب ملخص تقريرك البحثي هنا ليتم حفظه بملف إنجازك..." class="w-full text-xs p-2.5 border border-purple-200 rounded-lg bg-white focus:ring-2 focus:ring-purple-500 font-semibold text-purple-950"></textarea>
+                        
+                        <div class="model-answer hidden p-2.5 bg-white rounded-lg border border-purple-200 text-xs text-purple-900 font-bold">
+                            💡 **الإجابة البحثية النموذجية:** نلجأ لاستخدام العدسة الزيتية (100X) عند فحص العينات الدقيقة جداً كالبكتيريا وفيروسات معينة. وتوضع قطرة من زيت خاص (كزيت السدر) بين الشريحة والعدسة لمنع انكسار وتشتت الضوء وتركيزه بالكامل داخل العدسة.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEM Assessment Rubric -->
+        <footer class="bg-slate-900 text-white p-6 rounded-2xl space-y-4 shadow-xl border border-slate-800">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <h3 class="text-xs font-bold text-emerald-400 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-check"></i> شبكة التقييم الذاتي لحصيلة STEM (STEM Assessment Checklist)
+                </h3>
+                <div class="text-xs text-slate-300 font-bold">
+                    نسبة الإنجاز والتمكن: <span id="progressPercent" class="text-emerald-400 font-mono text-sm">0%</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div id="progressBar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-0 transition-all duration-500"></div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <label class="flex items-center gap-2 bg-slate-800/80 p-2.5 rounded-xl cursor-pointer hover:bg-slate-800 transition border border-slate-700">
+                    <input type="checkbox" onchange="updateProgress()" class="stem-check rounded text-emerald-500 focus:ring-0">
+                    <span>أحدد أجزاء المجهر الـ9 ووظائفها</span>
+                </label>
+                <label class="flex items-center gap-2 bg-slate-800/80 p-2.5 rounded-xl cursor-pointer hover:bg-slate-800 transition border border-slate-700">
+                    <input type="checkbox" onchange="updateProgress()" class="stem-check rounded text-emerald-500 focus:ring-0">
+                    <span>أطبق قواعد السلامة بالمختبر</span>
+                </label>
+                <label class="flex items-center gap-2 bg-slate-800/80 p-2.5 rounded-xl cursor-pointer hover:bg-slate-800 transition border border-slate-700">
+                    <input type="checkbox" onchange="updateProgress()" class="stem-check rounded text-emerald-500 focus:ring-0">
+                    <span>أحسب قوة التكبير رياضياً</span>
+                </label>
+                <label class="flex items-center gap-2 bg-slate-800/80 p-2.5 rounded-xl cursor-pointer hover:bg-slate-800 transition border border-slate-700">
+                    <input type="checkbox" onchange="updateProgress()" class="stem-check rounded text-emerald-500 focus:ring-0">
+                    <span>أتقن الرسم والتعبير المجهري</span>
+                </label>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        let currentObjective = 4; // 4X default
+        let audioEnabled = true;
+        let showAnswers = false;
+
+        // Specimen background textures (SVG Data/CSS Gradients representations)
+        const specimenData = {
+            onion: {
+                name: 'خلايا قشرة البصل',
+                bg: 'radial-gradient(circle, #fef3c7 10%, #d97706 90%)',
+                pattern: 'repeating-linear-gradient(45deg, rgba(180,83,9,0.3) 0, rgba(180,83,9,0.3) 10px, transparent 0, transparent 20px)'
+            },
+            paramecium: {
+                name: 'البراميسيوم',
+                bg: 'radial-gradient(circle, #ccfbf1 10%, #0f766e 90%)',
+                pattern: 'radial-gradient(circle at 50% 50%, #14b8a6 20%, transparent 21%)'
+            },
+            stomata: {
+                name: 'ثغور ورقة النبات',
+                bg: 'radial-gradient(circle, #dcfce7 10%, #15803d 90%)',
+                pattern: 'repeating-radial-gradient(circle at 30% 30%, #22c55e 0, #22c55e 15px, transparent 0, transparent 30px)'
+            },
+            blood: {
+                name: 'خلايا الدم الحمراء',
+                bg: 'radial-gradient(circle, #ffe4e6 10%, #be123c 90%)',
+                pattern: 'radial-gradient(circle at 40% 40%, #e11d48 15%, transparent 16%)'
+            }
+        };
+
+        // Microscope parts dictionary
+        const partsData = {
+            1: { title: '📌 1. العدسة العينية (Eyepiece)', desc: 'عدسة ننظر من خلالها تقع في أعلى الاسطوانة. تعمل على تكبير صورة العينة المتكونة بواسطة العدسة الشيئية.' },
+            2: { title: '📌 2. قرص تحريك العدسات (Nosepiece)', desc: 'قرص دائر متحرك يسمح بالتدوير والتبديل بين العدسات الشيئية المختلفة بسهولة وبصوت طقطقة تثبيت.' },
+            3: { title: '📌 3. العدسات الشيئية (Objective Lenses)', desc: 'مجموعة عدسات محدبة بالقرب من الشيء المراد فحصه، تتفاوت في قوة تكبيرها (صغرى 4X، وسطى 10X، كبرى 40X، زيتية 100X).' },
+            4: { title: '📌 4. المنضدة (Stage)', desc: 'سطح مستوٍ توضع عليه الشريحة الزجاجية، يحتوي في وسطه على فتحة لمرور الضوء ويمكن تحريكه للأعلى والأسفل.' },
+            5: { title: '📌 5. مثبت الشريحة (Stage Clips)', desc: 'رافعات معدنية تحافظ على ثبات الشريحة الزجاجية وعدم تحركها أثناء التحرّي والتفحص.' },
+            6: { title: '📌 6. الضابطان الكبيران (Coarse Focus Knob)', desc: 'عجلان كبيران يرفعان وينزلان المنضدة بسرعة لإحداث ضبط ورؤية أولية مبدئية للعينة.' },
+            7: { title: '📌 7. الضابطان الصغيران (Fine Focus Knob)', desc: 'عجلان صغيران يضبطان المسافة بدقة متناهية لإظهار المعالم الحيوية والتفاصيل المجهرية بدقة صافية.' },
+            8: { title: '📌 8. المكثف / مجمع الضوء (Condenser)', desc: 'قرص يقع أسفل المنضدة يتحكم بتركيز وكمية الضوء المار عبر الفتحة إلى الشريحة.' },
+            9: { title: '📌 9. مصدر الضوء (Light Source)', desc: 'مصباح كهربائي ينبعث منه الضوء المباشر لاختراق الشريحة الزجاجية متجهاً نحو العدسات.' }
+        };
+
+        window.onload = function() {
+            updateMicroscopeView();
+            initCanvas();
+        };
+
+        function playBeep() {
+            if (!audioEnabled) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 440;
+                gain.gain.value = 0.03;
+                osc.start();
+                osc.stop(ctx.currentTime + 0.08);
+            } catch (e) {}
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            document.getElementById('soundLabel').innerText = audioEnabled ? 'المؤثرات: مفعلة' : 'المؤثرات: معطلة';
+        }
+
+        function selectPart(id) {
+            playBeep();
+            const part = partsData[id];
+            document.getElementById('partTitle').innerText = part.title;
+            document.getElementById('partDesc').innerText = part.desc;
+        }
+
+        function setObjective(power) {
+            playBeep();
+            currentObjective = power;
+            document.querySelectorAll('.obj-btn').forEach(btn => {
+                btn.className = 'obj-btn bg-slate-200 text-slate-700 font-bold px-2.5 py-1.5 rounded-lg text-xs transition';
+            });
+            event.target.className = 'obj-btn bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-lg text-xs transition';
+            updateMicroscopeView();
+        }
+
+        function updateMicroscopeView() {
+            const slideKey = document.getElementById('slideSelect').value;
+            const coarse = parseInt(document.getElementById('coarseSlider').value);
+            const fine = parseInt(document.getElementById('fineSlider').value);
+            const light = parseInt(document.getElementById('lightSlider').value);
+
+            document.getElementById('coarseVal').innerText = coarse + '%';
+            document.getElementById('fineVal').innerText = fine + '%';
+            document.getElementById('lightVal').innerText = light + '%';
+
+            // Calculate total magnification
+            const totalMagnification = 10 * currentObjective; // Eyepiece is 10X standard
+            document.getElementById('magnificationDisplay').innerText = `التكبير الكلي: ${totalMagnification}X (10X × ${currentObjective}X)`;
+
+            // Blur calculation based on coarse and fine distance from ideal target
+            // Target coarse is 50, Target fine is 50
+            const coarseDiff = Math.abs(coarse - 50);
+            const fineDiff = Math.abs(fine - 50);
+            const totalBlur = (coarseDiff * 0.15) + (fineDiff * 0.08);
+
+            const lens = document.getElementById('lensView');
+            const spec = specimenData[slideKey];
+
+            lens.style.background = spec.bg;
+            lens.style.backgroundImage = spec.pattern + ', ' + spec.bg;
+            
+            // Zoom scale based on lens objective
+            let zoomScale = 1;
+            if (currentObjective === 10) zoomScale = 1.8;
+            if (currentObjective === 40) zoomScale = 3.2;
+            if (currentObjective === 100) zoomScale = 5.0;
+
+            lens.style.transform = `scale(${zoomScale})`;
+            lens.style.filter = `blur(${totalBlur}px) brightness(${light / 100})`;
+
+            // Status message
+            const statusBox = document.getElementById('focusStatus');
+            if (totalBlur < 1.2) {
+                statusBox.className = "p-2.5 rounded-xl text-center font-bold text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                statusBox.innerHTML = "✨ رؤية ممتازة وواضحة جداً! الصورة في البؤرة الصحيحة.";
+            } else if (totalBlur < 3.5) {
+                statusBox.className = "p-2.5 rounded-xl text-center font-bold text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                statusBox.innerHTML = "⚠️ الصورة شبه واضحة. حرك الضابط الصغير قليلاً للتوضيح.";
+            } else {
+                statusBox.className = "p-2.5 rounded-xl text-center font-bold text-xs bg-rose-500/20 text-rose-300 border border-rose-500/30";
+                statusBox.innerHTML = "❌ الصورة غير واضحة ومشوشة! اضبط الضابط الكبير والصغير.";
+            }
+        }
+
+        function checkMathQuiz() {
+            playBeep();
+            const answers = { math1: 40, math2: 100, math3: 400, math4: 1500 };
+            
+            for (let i = 1; i <= 4; i++) {
+                const val = parseInt(document.getElementById(`math${i}`).value);
+                const resEl = document.getElementById(`res${i}`);
+                if (val === answers[`math${i}`]) {
+                    resEl.innerHTML = '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> صحيح</span>';
+                } else {
+                    resEl.innerHTML = '<span class="text-rose-600 font-bold"><i class="fa-solid fa-circle-xmark"></i> خطأ (' + answers[`math${i}`] + 'X)</span>';
+                }
+            }
+        }
+
+        function checkStepOrder() {
+            playBeep();
+            alert('أحسنت! ترتيب خطوات التشغيل المعروض صحيحة ومطابقة للكتاب المدرسي.');
+        }
+
+        function toggleModelAnswers() {
+            showAnswers = !showAnswers;
+            playBeep();
+            const answers = document.querySelectorAll('.model-answer');
+            const btnLabel = document.getElementById('answersLabel');
+            
+            answers.forEach(el => {
+                if (showAnswers) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+
+            btnLabel.innerText = showAnswers ? 'إخفاء الإجابات النموذجية' : 'إظهار الإجابات النموذجية';
+        }
+
+        let canvas, ctx, isDrawing = false;
+
+        function initCanvas() {
+            canvas = document.getElementById('drawCanvas');
+            ctx = canvas.getContext('2d');
+
+            // Draw field circle
+            ctx.beginPath();
+            ctx.arc(190, 110, 100, 0, Math.PI * 2);
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+
+            // Touch support for mobile devices
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e.touches[0]); });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.strokeStyle = document.getElementById('brushColor').value;
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(190, 110, 100, 0, Math.PI * 2);
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        function updateProgress() {
+            const checks = document.querySelectorAll('.stem-check');
+            let count = 0;
+            checks.forEach(c => { if (c.checked) count++; });
+            const pct = Math.round((count / checks.length) * 100);
+            document.getElementById('progressPercent').innerText = pct + '%';
+            document.getElementById('progressBar').style.width = pct + '%';
+        }
+    </script>
+</body>
+</html>
